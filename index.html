@@ -1,0 +1,1104 @@
+<!-- Chosen Palette: Slate & Blue with Yellow/Green accents -->
+<!-- Application Structure Plan: The application is structured as a bilingual (Portuguese/English) single-page guide to the Present Perfect Simple. The information architecture is sequential: Introduction -> Persuasive explanation of why it's important -> Core concept with visual timelines -> Practical examples -> Grammatical structure -> Comparison with Present Perfect Continuous. A language switch button provides interactivity. This structure was chosen to build a strong conceptual foundation first, then provide practical application, which is ideal for language learning. -->
+<!-- Visualization & Content Choices: The source report's text is organized into visually distinct cards. Key concepts are presented using custom HTML/CSS timelines to visually represent the connection between past and present, a core challenge for learners. Examples are laid out in a two-column format for easy comparison between English and Portuguese. User interaction includes a language switcher to toggle all text content and copy-to-clipboard buttons for easy practice. This approach transforms a static text guide into an interactive, user-friendly learning tool. No SVG/Mermaid used. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="main-title">O Guia do Present Perfect Simple</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            background-image: radial-gradient(circle at top, #1e293b, #0f172a);
+        }
+        .container-card {
+            background-color: #1e293b;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 2.5rem;
+            border-left: 6px solid #4a90e2;
+            max-width: 50rem;
+            margin: auto;
+            transition: transform 0.3s ease-in-out;
+        }
+        .container-card:hover {
+            transform: translateY(-5px);
+        }
+        .phrase-block {
+            background-color: #2b3a53;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #475569;
+            transition: all 0.2s ease-in-out;
+        }
+        .phrase-block:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        .explanation-formula {
+            font-weight: 700;
+            color: #cbd5e1;
+        }
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2rem;
+            position: relative;
+        }
+        .timeline-line {
+            width: 100%;
+            height: 4px;
+            background-color: #4a90e2;
+            position: relative;
+            border-radius: 2px;
+        }
+        .timeline-marker {
+            width: 1rem;
+            height: 1rem;
+            background-color: #6ee7b7;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 10px #6ee7b7;
+        }
+        .timeline-marker.start {
+            left: 0;
+            transform: translateY(-50%) translateX(-50%);
+        }
+        .timeline-marker.end {
+            right: 0;
+            transform: translateY(-50%) translateX(50%);
+        }
+        .timeline-text {
+            position: absolute;
+            bottom: 1.5rem;
+            font-weight: bold;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+        .timeline-text.start {
+            left: 0;
+            transform: translateX(-50%);
+        }
+        .timeline-text.end {
+            right: 0;
+            transform: translateX(50%);
+        }
+        .timeline-text.action {
+            top: 1rem;
+            font-style: italic;
+            color: #6ee7b7;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .copy-btn {
+            background-color: #475569;
+            color: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            float: right;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .copy-btn:hover {
+            background-color: #64748b;
+        }
+        #message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2b3a53;
+            color: #e2e8f0;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .show {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid #475569;
+        }
+        th {
+            background-color: #475569;
+            color: #e2e8f0;
+            font-weight: 700;
+        }
+        tr:nth-child(even) {
+            background-color: #1e293b;
+        }
+        .exercise-container {
+            margin-bottom: 1.5rem;
+        }
+        .exercise-answer {
+            color: #6ee7b7;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+        .show-answer-btn {
+            background-color: #4a90e2;
+            color: #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .show-answer-btn:hover {
+            background-color: #3b7ad6;
+        }
+        .feedback-correct {
+            color: #34d399; /* green-400 */
+        }
+        .feedback-incorrect {
+            color: #f87171; /* red-400 */
+        }
+        .input-correct {
+            border-color: #34d399; /* green-400 */
+        }
+        .input-incorrect {
+            border-color: #f87171; /* red-400 */
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12 lg:p-16">
+    <div class="fixed top-6 right-6 z-50">
+        <button id="lang-switch-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200">
+            Switch to English
+        </button>
+    </div>
+
+    <div class="space-y-12 max-w-5xl mx-auto">
+        
+        <!-- Main title and explanation -->
+        <div class="container-card text-center">
+            <div class="phrase-block">
+                <h1 id="main-header" class="text-3xl font-extrabold text-white mb-4 flex items-center justify-center">
+                    <span class="mr-3">📚</span> O Guia Rápido do Present Perfect Simple
+                </h1>
+                <p id="main-text" class="text-lg leading-relaxed text-gray-300">
+                    Esse tempo verbal foca em **ações que foram concluídas no passado**, mas que possuem uma **conexão clara com o presente**. O mais importante é o **resultado ou a experiência**, e não o momento exato em que a ação ocorreu.
+                </p>
+            </div>
+        </div>
+
+        <!-- Why you should use the Present Perfect -->
+        <div class="container-card border-l-yellow-400">
+            <h2 id="why-use-header" class="text-2xl font-bold text-white mb-4 text-center">Por que usar o Present Perfect?</h2>
+            <div id="why-use-text" class="text-lg leading-relaxed text-gray-300">
+                Se você quer soar mais natural e preciso em inglês, o Present Perfect é a sua melhor aposta para muitas situações! Muitos de nós, brasileiros, tendemos a usar o Simple Past para quase tudo. Isso pode funcionar, mas o Present Perfect oferece uma conexão direta com o agora, algo que o Simple Past não consegue fazer.
+                <br><br>
+                Pense assim:
+                <ul class="list-disc list-inside mt-4 space-y-2">
+                    <li><strong class="text-red-400">Simple Past:</strong> Você só está falando sobre o passado. "I ate pizza." (Eu comi pizza.) A ação está completamente no passado, não tem nada a ver com o presente e também é uma ação super simples... não se trata de experiência.</li>
+                    <li><strong class="text-green-400">Present Perfect:</strong> Você está falando de uma ação passada, mas o <strong>resultado ainda importa</strong>. "I have eaten pizza." (Eu comi pizza.) Isso implica que você não está mais com fome, ou que a experiência de ter comido pizza é relevante para o que você está falando agora. É sobre a <strong>experiência</strong>, e não sobre quando ela aconteceu.</li>
+                </ul>
+                <br>
+                Em resumo, se a ação no passado tem uma consequência, um resultado, ou é uma experiência que afeta o presente, o Present Perfect é a escolha mais elegante e correta. Ele mostra uma compreensão mais profunda da gramática e fará sua comunicação soar mais fluida e autêntica.
+            </div>
+        </div>
+
+        <hr class="border-t-2 border-slate-700 my-8">
+
+        <!-- The Core Concept: Completed Action and Result -->
+        <div class="container-card">
+            <h2 id="core-concept-header" class="text-2xl font-bold text-white mb-6 text-center">O Conceito Central: Ação Concluída e Resultado</h2>
+            
+            <p id="core-concept-text" class="text-lg leading-relaxed text-gray-300 mb-8 text-center">
+                Pense no Present Perfect Simple como um elo que conecta o passado ao presente, destacando o impacto da ação.
+            </p>
+
+            <div class="space-y-12">
+                <!-- Case 1: Completed action with result -->
+                <div class="flex flex-col items-center">
+                    <p id="case-1-title" class="text-lg font-bold text-teal-400 mb-4">Caso 1: Ação concluída com um resultado no presente</p>
+                    <div class="timeline-container w-full">
+                        <div class="timeline-line w-2/3"></div>
+                        <div class="timeline-marker start"></div>
+                        <div class="timeline-marker" style="left: 66%; transform: translateY(-50%) translateX(-50%);"></div>
+                        <span id="case-1-timeline-past" class="timeline-text start">O Passado</span>
+                        <span id="case-1-timeline-action" class="timeline-text action" style="left: 33%; transform: translateX(-50%);">Ação Concluída</span>
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2">
+                            <svg class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </div>
+                        <span id="case-1-timeline-result" class="absolute right-0 bottom-4 font-bold text-gray-400 text-sm md:text-base">Resultado no Presente</span>
+                    </div>
+                </div>
+
+                <!-- Case 2: Life Experience -->
+                <div class="flex flex-col items-center">
+                    <p id="case-2-title" class="text-lg font-bold text-teal-400 mb-4">Caso 2: Experiência de vida</p>
+                    <div class="timeline-container w-full">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-marker start"></div>
+                        <span id="case-2-timeline-action" class="timeline-text action">Experiência</span>
+                        <span id="case-2-timeline-present" class="timeline-text end">No Presente</span>
+                        <span id="case-2-timeline-at-some-point" class="absolute left-1/3 bottom-4 text-xs italic text-gray-400">Em algum momento</span>
+                        <div class="absolute right-1/4 top-1/2 -translate-y-1/2 -rotate-12">
+                            <svg class="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8 mt-8">
+                <!-- Exemplo - Ação Concluída com Resultado -->
+                <div class="phrase-block bg-slate-800 p-6 rounded-lg shadow-inner">
+                    <h3 id="completed-action-title" class="text-xl font-bold text-sky-400 mb-4">Exemplo - Ação Concluída com Resultado</h3>
+                    <p id="completed-action-desc" class="text-sm text-gray-400 mb-6">Ação que acabou de terminar e tem um resultado visível no presente.</p>
+                    
+                    <!-- New section for "acabar de" -->
+                    <div class="bg-gray-700 p-4 rounded-lg border-l-4 border-l-yellow-400 mb-6">
+                        <p id="acabar-de-title" class="text-lg font-semibold text-yellow-300 mb-2">Atenção!</p>
+                        <p id="acabar-de-text" class="text-base text-gray-300 mb-4">A expressão **"acabar de (verbo)"** em português é traduzida para o inglês usando o **Present Perfect**.</p>
+                        
+                        <!-- Table for "acabar de" examples -->
+                        <div class="mt-4">
+                            <h4 id="acabar-de-table-title" class="text-lg font-semibold text-yellow-300 mb-2">Exemplos claros:</h4>
+                            <table class="w-full">
+                                <thead>
+                                    <tr>
+                                        <th id="table-header-pt" class="text-sm font-semibold text-gray-200">Português</th>
+                                        <th id="table-header-en" class="text-sm font-semibold text-gray-200">Inglês</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="table-ex1-pt">Acabei de me levantar.</td>
+                                        <td id="table-ex1-en" class="italic">I have just woken up.</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex2-pt">Acabamos de terminar o relatório.</td>
+                                        <td id="table-ex2-en" class="italic">We have just finished the report.</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex3-pt">Ele acabou de sair.</td>
+                                        <td id="table-ex3-en" class="italic">He has just left.</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex4-pt">Ela acabou de comer.</td>
+                                        <td id="table-ex4-en" class="italic">She has just eaten.</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex5-pt">Acabei de ver uma estrela cadente!</td>
+                                        <td id="table-ex5-en" class="italic">I have just seen a shooting star!</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex6-pt">Eles acabaram de se mudar.</td>
+                                        <td id="table-ex6-en" class="italic">They have just moved.</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex7-pt">A reunião acabou de começar.</td>
+                                        <td id="table-ex7-en" class="italic">The meeting has just started.</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex8-pt">Vocês acabaram de chegar?</td>
+                                        <td id="table-ex8-en" class="italic">Have you just arrived?</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex9-pt">Acabei de comprar um carro novo.</td>
+                                        <td id="table-ex9-en" class="italic">I have just bought a new car.</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="table-ex10-pt">Ele acabou de ligar para mim.</td>
+                                        <td id="table-ex10-en" class="italic">He has just called me.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Example 1 -->
+                    <div class="bg-slate-700 p-4 rounded-lg mb-4 shadow">
+                        <div class="flex flex-col md:flex-row md:space-x-6 w-full">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <span id="completed-ex1-en-label" class="font-bold text-emerald-400 block">Inglês:</span>
+                                <span id="completed-ex1-en" class="italic text-gray-200 block">"We have just finished the project."</span>
+                            </div>
+                            <div class="flex-1">
+                                <span id="completed-ex1-pt-label" class="font-bold text-sky-400 block">Português:</span>
+                                <span id="completed-ex1-pt" class="italic text-gray-200 block">"Nós <span class="font-bold underline text-yellow-300">acabamos de terminar</span> o projeto."</span>
+                                <p id="completed-ex1-verb-tense" class="text-sm text-gray-400 mt-1">Tempo verbal: Presente Perfeito</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example 2 -->
+                    <div class="bg-slate-700 p-4 rounded-lg mb-4 shadow">
+                        <div class="flex flex-col md:flex-row md:space-x-6 w-full">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <span id="completed-ex2-en-label" class="font-bold text-emerald-400 block">Inglês:</span>
+                                <span id="completed-ex2-en" class="italic text-gray-200 block">"He has lost his key, so he can't get into the house."</span>
+                            </div>
+                            <div class="flex-1">
+                                <span id="completed-ex2-pt-label" class="font-bold text-sky-400 block">Português:</span>
+                                <span id="completed-ex2-pt" class="italic text-gray-200 block">"Ele <span class="font-bold underline text-yellow-300">perdeu</span> a chave, então não pode entrar em casa."</span>
+                                <p id="completed-ex2-verb-tense" class="text-sm text-gray-400 mt-1">Tempo verbal: Pretérito Perfeito Simples</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example 3 -->
+                    <div class="bg-slate-700 p-4 rounded-lg mb-4 shadow">
+                        <div class="flex flex-col md:flex-row md:space-x-6 w-full">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <span id="completed-ex3-en-label" class="font-bold text-emerald-400 block">Inglês:</span>
+                                <span id="completed-ex3-en" class="italic text-gray-200 block">"The report has been sent to the client."</span>
+                            </div>
+                            <div class="flex-1">
+                                <span id="completed-ex3-pt-label" class="font-bold text-sky-400 block">Português:</span>
+                                <span id="completed-ex3-pt" class="italic text-gray-200 block">"O relatório <span class="font-bold underline text-yellow-300">foi enviado</span> para o cliente."</span>
+                                <p id="completed-ex3-verb-tense" class="text-sm text-gray-400 mt-1">Tempo verbal: Pretérito Perfeito</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example 4 -->
+                    <div class="bg-slate-700 p-4 rounded-lg mb-4 shadow">
+                        <div class="flex flex-col md:flex-row md:space-x-6 w-full">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <span id="completed-ex4-en-label" class="font-bold text-emerald-400 block">Inglês:</span>
+                                <span id="completed-ex4-en" class="italic text-gray-200 block">"I have bought a new car."</span>
+                            </div>
+                            <div class="flex-1">
+                                <span id="completed-ex4-pt-label" class="font-bold text-sky-400 block">Português:</span>
+                                <span id="completed-ex4-pt" class="italic text-gray-200 block">"Eu <span class="font-bold underline text-yellow-300">comprei</span> um carro novo."</span>
+                                <p id="completed-ex4-verb-tense" class="text-sm text-gray-400 mt-1">Tempo verbal: Pretérito Perfeito Simples</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example 5 -->
+                    <div class="bg-slate-700 p-4 rounded-lg mb-4 shadow">
+                        <div class="flex flex-col md:flex-row md:space-x-6 w-full">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <span id="completed-ex5-en-label" class="font-bold text-emerald-400 block">Inglês:</span>
+                                <span id="completed-ex5-en" class="italic text-gray-200 block">"They have finished their homework."</span>
+                            </div>
+                            <div class="flex-1">
+                                <span id="completed-ex5-pt-label" class="font-bold text-sky-400 block">Português:</span>
+                                <span id="completed-ex5-pt" class="italic text-gray-200 block">"Eles <span class="font-bold underline text-yellow-300">terminaram</span> a lição de casa."</span>
+                                <p id="completed-ex5-verb-tense" class="text-sm text-gray-400 mt-1">Tempo verbal: Pretérito Perfeito Simples</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exemplo - Experiência de Vida -->
+                <div class="phrase-block bg-slate-800 p-6 rounded-lg shadow-inner">
+                    <h3 id="life-experience-title" class="text-xl font-bold text-sky-400 mb-4">Exemplo - Experiência de Vida</h3>
+                    <p id="life-experience-desc" class="text-sm text-gray-400 mb-6">Ação que aconteceu em um momento não especificado no passado, mas que contribui para sua experiência de vida até o presente.</p>
+                    
+                    <!-- Example 1 -->
+                    <div class="bg-slate-700 p-4 rounded-lg mb-4 shadow">
+                        <div class="flex flex-col md:flex-row md:space-x-6 w-full">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <span id="experience-ex1-en-label" class="font-bold text-emerald-400 block">Inglês:</span>
+                                <span id="experience-ex1-en" class="italic text-gray-200 block">"I have visited Paris three times."</span>
+                            </div>
+                            <div class="flex-1">
+                                <span id="experience-ex1-pt-label" class="font-bold text-sky-400 block">Português:</span>
+                                <span id="experience-ex1-pt" class="italic text-gray-200 block">"Eu já <span class="font-bold underline text-yellow-300">visitei</span> Paris três vezes."</span>
+                                <p id="experience-ex1-verb-tense" class="text-sm text-gray-400 mt-1">Tempo verbal: Presente Perfeito</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example 2 -->
+                    <div class="bg-slate-700 p-4 rounded-lg mb-4 shadow">
+                        <div class="flex flex-col md:flex-row md:space-x-6 w-full">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <span id="experience-ex2-en-label" class="font-bold text-emerald-400 block">Inglês:</span>
+                                <span id="experience-ex2-en" class="italic text-gray-200 block">"She has never flown on a plane before."</span>
+                            </div>
+                            <div class="flex-1">
+                                <span id="experience-ex2-pt-label" class="font-bold text-sky-400 block">Português:</span>
+                                <span id="experience-ex2-pt" class="italic text-gray-200 block">"Ela <span class="font-bold underline text-yellow-300">nunca viajou</span> de avião antes."</span>
+                                <p id="experience-ex2-verb-tense" class="text-sm text-gray-400 mt-1">Tempo verbal: Presente Perfeito</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Example 3 -->
+                    <div class="bg-slate-700 p-4 rounded-lg mb-4 shadow">
+                        <div class="flex flex-col md:flex-row md:space-x-6 w-full">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <span id="experience-ex3-en-label" class="font-bold text-emerald-400 block">Inglês:</span>
+                                <span id="experience-ex3-en" class="italic text-gray-200 block">"They have already seen this movie, so they don't want to watch it again."</span>
+                            </div>
+                            <div class="flex-1">
+                                <span id="experience-ex3-pt-label" class="font-bold text-sky-400 block">Português:</span>
+                                <span id="experience-ex3-pt" class="italic text-gray-200 block">"Eles já <span class="font-bold underline text-yellow-300">viram</span> esse filme, então não querem assistir de novo."</span>
+                                <p id="experience-ex3-verb-tense" class="text-sm text-gray-400 mt-1">Tempo verbal: Presente Perfeito</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-t-2 border-slate-700 my-8">
+
+                <!-- The Art of Interpretation -->
+                <div class="container-card border-l-orange-400">
+                    <h2 id="art-of-interpretation-header" class="text-2xl font-bold text-white mb-4 text-center">Além das Regras: A Arte de Interpretar o Português</h2>
+                    <p id="art-of-interpretation-text" class="text-lg leading-relaxed text-gray-300">
+                        Quando você olha para uma tradução do português, verá que é mais do que uma simples conversão de palavra por palavra. Isso porque o português é uma língua com um sistema de tempos verbais profundamente complexo e expressivo. Para um tradutor, não se trata de seguir um conjunto rígido de regras; trata-se da arte de interpretar o significado, o tom e o contexto.
+                        <br><br>
+                        Considere um conceito simples como o tempo passado. Em português, existem várias maneiras de expressar ações passadas, cada uma com um propósito distinto. Por exemplo, um tradutor deve escolher entre o **pretérito perfeito** e o **pretérito imperfeito**. O primeiro é usado para uma única ação concluída no passado, como "Eu *fui* ao mercado". O segundo, no entanto, é usado para uma ação que era habitual ou contínua no passado, como "Eu *ia* ao mercado todos os dias."
+                        <br><br>
+                        Embora ambos se traduzam para "went" ou "used to go", a distinção sutil carrega muito significado. Escolher a opção certa exige uma compreensão profunda da intenção do falante e do fluxo da narrativa. Da mesma forma, os vários modos subjuntivos exigem que um tradutor interprete condições, desejos e possibilidades, em vez de simplesmente converter palavras.
+                        <br><br>
+                        Em última análise, é por isso que traduzir português é um ato de interpretação, não apenas de gramática. Exige sensibilidade à nuances, compreensão cultural e a capacidade de escolher as palavras que melhor capturem o sentimento e a intenção original, permitindo que o verdadeiro significado transcenda as fronteiras linguísticas.
+                    </p>
+                </div>
+
+                <hr class="border-t-2 border-slate-700 my-8">
+
+                <!-- Grammar Structure -->
+                <div class="container-card">
+                    <h2 id="grammar-header" class="text-2xl font-bold text-white mb-6 text-center">A Estrutura Gramatical</h2>
+                    <p id="grammar-text" class="text-lg leading-relaxed text-gray-300 mb-8 text-center">
+                        A fórmula é simples. Basta usar o auxiliar correto para o sujeito e o particípio passado do verbo principal.
+                    </p>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <!-- Affirmative -->
+                        <div class="phrase-block">
+                            <h3 id="affirmative-header" class="text-xl font-bold text-white mb-2">Forma Afirmativa</h3>
+                            <p id="affirmative-text" class="text-lg leading-relaxed text-gray-300 mb-4">
+                                <span class="explanation-formula italic">**Sujeto + have/has + Past Participle**</span>
+                            </p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <button class="copy-btn" onclick="copyToClipboard('I have finished the report.')">Copiar</button>
+                                    <span class="italic text-gray-400">"I have finished the report."</span>
+                                </li>
+                                <li>
+                                    <button class="copy-btn" onclick="copyToClipboard('He has worked at Google.')">Copiar</button>
+                                    <span class="italic text-gray-400">"He has worked at Google."</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Negative -->
+                        <div class="phrase-block">
+                            <h3 id="negative-header" class="text-xl font-bold text-white mb-2">Forma Negativa</h3>
+                            <p id="negative-text" class="text-lg leading-relaxed text-gray-300 mb-4">
+                                <span class="explanation-formula italic">**Sujeto + have/has + not + Past Participle**</span>
+                            </p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <button class="copy-btn" onclick="copyToClipboard('I have not finished my lunch.')">Copiar</button>
+                                    <span class="italic text-gray-400">"I have not finished my lunch."</span>
+                                </li>
+                                <li>
+                                    <button class="copy-btn" onclick="copyToClipboard('She has not seen the movie.')">Copiar</button>
+                                    <span class="italic text-gray-400">"She has not seen the movie."</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Questions -->
+                        <div class="phrase-block">
+                            <h3 id="questions-header" class="text-xl font-bold text-white mb-2">Perguntas</h3>
+                            <p id="questions-text" class="text-lg leading-relaxed text-gray-300 mb-4">
+                                <span class="explanation-formula italic">**Have/Has + Sujeto + Past Participle?**</span>
+                            </p>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <button class="copy-btn" onclick="copyToClipboard('Have you finished the report?')">Copiar</button>
+                                    <span class="italic text-gray-400">"Have you finished the report?"</span>
+                                </li>
+                                <li>
+                                    <button class="copy-btn" onclick="copyToClipboard('Has he seen that film?')">Copiar</button>
+                                    <span class="italic text-gray-400">"Has he seen that film?"</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- New: Subject note -->
+                    <div class="mt-8 phrase-block">
+                        <h3 id="subject-note-header" class="text-xl font-bold text-orange-400 mb-2">Atenção: A Ordem das Palavras</h3>
+                        <p id="subject-note-text" class="text-lg leading-relaxed text-gray-300">
+                            Em português, podemos começar frases com um verbo, como em "**Fui** ao mercado". Em inglês, isso **não é possível**. A regra geral é **sempre começar a frase com o sujeito** (I, you, he, she, etc.) antes do verbo, por exemplo: "**I** have gone to the market".
+                        </p>
+                    </div>
+
+                </div>
+
+                <hr class="border-t-2 border-slate-700 my-8">
+                
+                <!-- Updated: Difference with Present Perfect Simple and Continuous -->
+                <div class="container-card">
+                    <h2 id="difference-header" class="text-2xl font-bold text-white mb-6 text-center">Quando Usar o Present Perfect Simple vs. Continuous</h2>
+                    <p id="difference-text" class="text-lg leading-relaxed text-gray-300 mb-8 text-center">
+                        Ambas as formas do **Present Perfect** focam na experiência e na importância da ação. A principal diferença está no que cada uma enfatiza.
+                    </p>
+
+                    <hr class="border-t-2 border-slate-700 my-8">
+
+                    <!-- Present Perfect Simple section -->
+                    <div class="phrase-block border-l-4 border-l-red-400 mb-6">
+                        <h3 id="simple-header" class="text-xl font-bold text-white mb-2">Present Perfect Simple</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-300">
+                            <li><strong id="simple-focus-title">Foco:</strong> <span id="simple-focus-text">A **experiência ou o resultado** da ação.</span></li>
+                            <li><strong id="simple-question-title">Principal Pergunta:</strong> <span id="simple-question-text">"O que aconteceu?"</span></li>
+                            <li><strong id="simple-example-title">Exemplo:</strong> <span id="simple-example-text">"I have written a letter." (Eu escrevi uma carta.)</span></li>
+                            <li><strong id="simple-tip-title">Dica:</strong> <span id="simple-tip-text">O que importa é que a carta foi escrita (o resultado). Não focamos no processo de escrever, mas sim no fato de que a ação aconteceu e o resultado está aqui.</span></li>
+                        </ul>
+                    </div>
+
+                    <hr class="border-t-2 border-slate-700 my-8">
+
+                    <!-- Present Perfect Continuous section -->
+                    <div class="phrase-block border-l-4 border-l-green-400">
+                        <h3 id="continuous-header" class="text-xl font-bold text-white mb-2">Present Perfect Continuous</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-300">
+                            <li><strong id="continuous-focus-title">Foco:</strong> <span id="continuous-focus-text">A **duração e a continuidade** da ação.</span></li>
+                            <li><strong id="continuous-question-title">Principal Pergunta:</strong> <span id="continuous-question-text">"Por quanto tempo?"</span></li>
+                            <li><strong id="continuous-example-title">Exemplo:</strong> <span id="continuous-example-text">"Eu tenho escrito esta carta por uma hora."</span></li>
+                            <li><strong id="continuous-tip-title">Dica:</strong> <span id="continuous-tip-text">O que importa aqui é o processo e o tempo que a ação levou. O foco está na continuidade, na duração da ação, que começou no passado e ainda pode estar ocorrendo ou ter acabado de terminar.</span></li>
+                        </ul>
+                    </div>
+
+                    <hr class="border-t-2 border-slate-700 my-8">
+
+                    <p id="summary-text" class="text-lg leading-relaxed text-gray-300 text-center mt-6">
+                        Em resumo, a escolha entre os dois depende de onde você quer colocar a ênfase: no **resultado** (Simple) ou na **duração/processo** (Continuous).
+                    </p>
+                </div>
+
+                <!-- NEW: Interactive Translation Exercises -->
+                <div class="container-card border-l-yellow-400">
+                    <h2 id="exercises-header" class="text-2xl font-bold text-white mb-6 text-center">Exercícios de Tradução</h2>
+                    <p id="exercises-text" class="text-lg leading-relaxed text-gray-300 mb-8 text-center">
+                        Traduza as frases abaixo, que usam o pretérito perfeito simples em português, para o inglês.
+                    </p>
+
+                    <div id="exercises-container" class="space-y-6">
+                        <!-- Exercise items will be dynamically inserted here -->
+                    </div>
+
+                    <div class="mt-8 flex justify-center">
+                        <button id="check-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 transform hover:scale-105">
+                            Verificar Respostas
+                        </button>
+                    </div>
+                </div>
+                <!-- END NEW SECTION -->
+            </div>
+        </div>
+    </div>
+    
+    <div id="message-box"></div>
+
+    <script>
+        const translations = {
+            en: {
+                button: "Mudar para Português",
+                mainHeader: "📚 The Quick Guide to the Present Perfect Simple",
+                mainText: "This verb tense focuses on **actions that were completed in the past**, but which have a **clear connection to the present**. The most important thing is the **result or the experience**, not the exact moment the action occurred.",
+                whyUseHeader: "Why Use the Present Perfect?",
+                whyUseText: "If you want to sound more natural and precise in English, the Present Perfect is your best bet for many situations! Many of us, as Brazilians, tend to default to the Simple Past for almost everything. While that can work, the Present Perfect offers a direct connection to the present that the Simple Past can't provide.<br><br>Think of it this way:<ul class='list-disc list-inside mt-4 space-y-2'><li><strong class='text-red-400'>Simple Past:</strong> You're only talking about the past. 'I ate pizza.' The action is completely in the past, has no connection to the present, and is also a very simple action... it's not about an experience.</li><li><strong class='text-green-400'>Present Perfect:</strong> You're talking about a past action, but the <strong>result still matters</strong>. 'I have eaten pizza.' This implies you're no longer hungry, or that the experience of eating pizza is relevant to what you're discussing now. It's about the <strong>experience</strong>, and not when it happened.</li></ul><br>In short, if a past action has a consequence, a result, or is an experience that affects the present, the Present Perfect is the more elegant and correct choice. It shows a deeper understanding of the grammar and will make your communication sound more fluent and authentic.",
+                coreConceptHeader: "The Core Concept: Completed Action and Result",
+                coreConceptText: "Think of the Present Perfect Simple as a link connecting the past to the present, highlighting the impact of the action.",
+                case1Title: "Case 1: Completed action with a result in the present",
+                case1TimelinePast: "The Past",
+                case1TimelineAction: "Action Completed",
+                case1TimelineResult: "Result in the Present",
+                case2Title: "Case 2: A life experience",
+                case2TimelinePast: "The Past",
+                case2TimelineAction: "Experience",
+                case2TimelineAtSomePoint: "At some point",
+                case2TimelinePresent: "In the Present",
+                completedActionTitle: "Example - Completed Action with Result",
+                completedActionDesc: "An action that just finished and has a visible result in the present.",
+                acabarDeTitle: "Important!",
+                acabarDeText: `The expression **"acabar de (verbo)"** in Portuguese is translated to English using the **Present Perfect**.`,
+                acabarDeTableTitle: "Clear examples:",
+                tableHeaderPt: "Portuguese",
+                tableHeaderEn: "English",
+                tableEx1Pt: "Acabei de me levantar.",
+                tableEx1En: "I have just woken up.",
+                tableEx2Pt: "Acabamos de terminar o relatório.",
+                tableEx2En: "We have just finished the report.",
+                tableEx3Pt: "Ele acabou de sair.",
+                tableEx3En: "He has just left.",
+                tableEx4Pt: "Ela acabou de comer.",
+                tableEx4En: "She has just eaten.",
+                tableEx5Pt: "Acabei de ver uma estrela cadente!",
+                tableEx5En: "I have just seen a shooting star!",
+                tableEx6Pt: "Eles acabaram de se mudar.",
+                tableEx6En: "They have just moved.",
+                tableEx7Pt: "A reunião acabou de começar.",
+                tableEx7En: "The meeting has just started.",
+                tableEx8Pt: "Vocês acabaram de chegar?",
+                tableEx8En: "Have you just arrived?",
+                tableEx9Pt: "Acabei de comprar um carro novo.",
+                tableEx9En: "I have just bought a new car.",
+                tableEx10Pt: "Ele acabou de ligar para mim.",
+                tableEx10En: "He has just called me.",
+                completedEx1EnLabel: "English:",
+                completedEx1En: `"We have just finished the project."`,
+                completedEx1PtLabel: "Portuguese:",
+                completedEx1Pt: `"Nós <span class="font-bold underline text-yellow-300">acabamos de terminar</span> o projeto."`,
+                completedEx1VerbTense: "Verb Tense: Present Perfect",
+                completedEx2EnLabel: "English:",
+                completedEx2En: `"He has lost his key, so he can't get into the house."`,
+                completedEx2PtLabel: "Portuguese:",
+                completedEx2Pt: `"Ele <span class="font-bold underline text-yellow-300">perdeu</span> a chave, então não pode entrar em casa."`,
+                completedEx2VerbTense: "Verb Tense: Past Perfect Simple",
+                completedEx3EnLabel: "English:",
+                completedEx3En: `"The report has been sent to the client."`,
+                completedEx3PtLabel: "Portuguese:",
+                completedEx3Pt: `"O relatório <span class="font-bold underline text-yellow-300">foi enviado</span> para o cliente."`,
+                completedEx3VerbTense: "Verb Tense: Past Perfect",
+                completedEx4EnLabel: "English:",
+                completedEx4En: `"I have bought a new car."`,
+                completedEx4PtLabel: "Portuguese:",
+                completedEx4Pt: `"Eu <span class="font-bold underline text-yellow-300">comprei</span> um carro novo."`,
+                completedEx4VerbTense: "Verb Tense: Past Perfect Simple",
+                completedEx5EnLabel: "English:",
+                completedEx5En: `"They have finished their homework."`,
+                completedEx5PtLabel: "Portuguese:",
+                completedEx5Pt: `"Eles <span class="font-bold underline text-yellow-300">terminaram</span> a lição de casa."`,
+                completedEx5VerbTense: "Verb Tense: Past Perfect Simples",
+                lifeExperienceTitle: "Example - A Life Experience",
+                lifeExperienceDesc: "An action that happened at an unspecified time in the past, but which contributes to your life experience up to the present.",
+                experienceEx1EnLabel: "English:",
+                experienceEx1En: `"I have visited Paris three times."`,
+                experienceEx1PtLabel: "Portuguese:",
+                experienceEx1Pt: `"Eu já <span class="font-bold underline text-yellow-300">visitei</span> Paris três vezes."`,
+                experienceEx1VerbTense: "Verb Tense: Present Perfect",
+                experienceEx2EnLabel: "English:",
+                experienceEx2En: `"She has never flown on a plane before."`,
+                experienceEx2PtLabel: "Portuguese:",
+                experienceEx2Pt: `"Ela <span class="font-bold underline text-yellow-300">nunca viajou</span> de avião antes."`,
+                experienceEx2VerbTense: "Verb Tense: Present Perfect",
+                experienceEx3EnLabel: "English:",
+                experienceEx3En: `"They have already seen this movie, so they don't want to watch it again."`,
+                experienceEx3PtLabel: "Portuguese:",
+                experienceEx3Pt: `"Eles já <span class="font-bold underline text-yellow-300">viram</span> esse filme, então não querem assistir de novo."`,
+                experienceEx3VerbTense: "Verb Tense: Present Perfect",
+                artOfInterpretationHeader: "Beyond the Rules: The Art of Interpreting Portuguese",
+                artOfInterpretationText: `When you look at a translation of Portuguese, you'll see that it's more than a simple, word-for-word conversion. That's because Portuguese is a language with a deeply nuanced and expressive system of verb tenses. For a translator, it’s not about following a rigid set of rules; it's about the art of interpreting meaning, tone, and context.<br><br>Consider a simple concept like the past tense. In Portuguese, there are several ways to express past actions, each with a distinct purpose. For example, a translator must choose between the **pretérito perfeito** and the **pretérito imperfeito**. The first is used for a single, completed action in the past, like "Eu *fui* ao mercado" (I **went** to the market). The second, however, is used for an action that was habitual or ongoing in the past, such as "Eu *ia* ao mercado todos os dias" (I **used to go** to the market every day).<br><br>While both translate to "went" or "used to go," the subtle distinction holds a lot of meaning. Choosing the right one requires a deep understanding of the speaker's intent and the narrative's flow. Similarly, the various subjunctive moods require a translator to interpret conditions, wishes, and possibilities rather than simply converting words.<br><br>Ultimately, this is why translating Portuguese is an act of interpretation, not just grammar. It requires a sensitivity to nuance, a cultural understanding, and the ability to choose the words that best capture the original feeling and intent, allowing the true meaning to transcend linguistic boundaries.`,
+                exercisesHeader: "Translation Exercises",
+                exercisesText: "Translate the following sentences, which use the simple past tense in Portuguese, into English.",
+                checkButtonText: "Check Answers",
+                grammarHeader: "The Grammatical Structure",
+                grammarText: "The formula is simple. Just use the correct auxiliary for the subject and the past participle of the main verb.",
+                affirmativeHeader: "Affirmative Form",
+                affirmativeText: `<span class="explanation-formula italic">**Subject + have/has + Past Participle**</span>`,
+                negativeHeader: "Negative Form",
+                negativeText: `<span class="explanation-formula italic">**Subject + have/has + not + Past Participle**</span>`,
+                questionsHeader: "Questions",
+                questionsText: `<span class="explanation-formula italic">**Have/Has + Subject + Past Participle?**</span>`,
+                subjectNoteHeader: "Note: Word Order",
+                subjectNoteText: "In Portuguese, we can start sentences with a verb, like \"**Fui** ao mercado\". In English, this is **not possible**. The general rule is always to **start the sentence with the subject** (I, you, he, she, etc.) before the verb, for example: \"**I** have gone to the market\".",
+                differenceHeader: "When to Use the Present Perfect Simple vs. Continuous",
+                differenceText: "Both forms of the **Present Perfect** focus on the experience and importance of the action. The main difference lies in what each emphasizes.",
+                simpleHeader: "Present Perfect Simple",
+                simpleFocusTitle: "Focus:",
+                simpleFocusText: "The **experience or the result** of the action.",
+                simpleQuestionTitle: "Main Question:",
+                simpleQuestionText: "\"What happened?\"",
+                simpleExampleTitle: "Example:",
+                simpleExampleText: `"I have written a letter." (Eu escrevi uma carta.)`,
+                simpleTipTitle: "Tip:",
+                simpleTipText: "What matters is that the letter was written (the result). We don't focus on the process of writing, but on the fact that the action happened and the result is here.",
+                continuousHeader: "Present Perfect Continuous",
+                continuousFocusTitle: "Focus:",
+                continuousFocusText: "The **duration and continuity** of the action.",
+                continuousQuestionTitle: "Main Question:",
+                continuousQuestionText: "\"For how long?\"",
+                continuousExampleTitle: "Example:",
+                continuousExampleText: `"Eu tenho escrito esta carta por uma hora."`,
+                continuousTipTitle: "Tip:",
+                continuousTipText: "What matters here is the process and the time the action took. The focus is on the continuity, the duration of the action, which started in the past and may still be ongoing or have just finished.",
+                summaryText: "In short, the choice between the two depends on where you want to place the emphasis: on the **result** (Simple) or on the **duration/process** (Continuous).",
+                copySuccess: "Text copied to clipboard!",
+                feedbackCorrect: "Correto!",
+                feedbackIncorrect: "Incorreto. A resposta correta é:",
+                pleaseAnswer: "Please enter your answer.",
+            },
+            pt: {
+                button: "Switch to English",
+                mainHeader: "📚 O Guia Rápido do Present Perfect Simple",
+                mainText: "Esse tempo verbal foca em **ações que foram concluídas no passado**, mas que possuem uma **conexão clara com o presente**. O mais importante é o **resultado ou a experiência**, e não o momento exato em que a ação ocorreu.",
+                whyUseHeader: "Por que usar o Present Perfect?",
+                whyUseText: "Se você quer soar mais natural e preciso em inglês, o Present Perfect é a sua melhor aposta para muitas situações! Muitos de nós, brasileiros, tendemos a usar o Simple Past para quase tudo. Isso pode funcionar, mas o Present Perfect oferece uma conexão direta com o agora, algo que o Simple Past não consegue fazer.<br><br>Pense assim:<ul class='list-disc list-inside mt-4 space-y-2'><li><strong class='text-red-400'>Simple Past:</strong> Você só está falando sobre o passado. \"I ate pizza.\" (Eu comi pizza.) Ação está completamente no passado, não tem nada a ver com o presente e também é uma ação super simples... não se trata de experiência.</li><li><strong class='text-green-400'>Present Perfect:</strong> Você está falando de uma ação passada, mas o <strong>resultado ainda importa</strong>. \"I have eaten pizza.\" (Eu comi pizza.) Isso implica que você não está mais com fome, ou que a experiência de ter comido pizza é relevante para o que você está falando agora. É sobre a <strong>experiência</strong>, e não sobre quando ela aconteceu.</li></ul><br>Em resumo, se a ação no passado tem uma consequência, um resultado, ou é uma experiência que afeta o presente, o Present Perfect é a escolha mais elegante e correta. Ele mostra uma compreensão mais profunda da gramática e fará sua comunicação soar mais fluida e autêntica.",
+                coreConceptHeader: "O Conceito Central: Ação Concluída e Resultado",
+                coreConceptText: "Pense no Present Perfect Simple como um elo que conecta o passado ao presente, destacando o impacto da ação.",
+                case1Title: "Caso 1: Ação concluída com um resultado no presente",
+                case1TimelinePast: "O Passado",
+                case1TimelineAction: "Ação Concluída",
+                case1TimelineResult: "Resultado no Presente",
+                case2Title: "Caso 2: Experiência de vida",
+                case2TimelinePast: "O Passado",
+                case2TimelineAction: "Experiência",
+                case2TimelineAtSomePoint: "Em algum momento",
+                case2TimelinePresent: "No Presente",
+                completedActionTitle: "Exemplo - Ação Concluída com Resultado",
+                completedActionDesc: "Ação que acabou de terminar e tem um resultado visível no presente.",
+                acabarDeTitle: "Atenção!",
+                acabarDeText: `A expressão **"acabar de (verbo)"** em português é traduzida para o inglês usando o **Present Perfect**.<br><br>`,
+                acabarDeTableTitle: "Exemplos claros:",
+                tableHeaderPt: "Português",
+                tableHeaderEn: "Inglês",
+                tableEx1Pt: "Acabei de me levantar.",
+                tableEx1En: "I have just woken up.",
+                tableEx2Pt: "Acabamos de terminar o relatório.",
+                tableEx2En: "We have just finished the report.",
+                tableEx3Pt: "Ele acabou de sair.",
+                tableEx3En: "He has just left.",
+                tableEx4Pt: "Ela acabou de comer.",
+                tableEx4En: "She has just eaten.",
+                tableEx5Pt: "Acabei de ver uma estrela cadente!",
+                tableEx5En: "I have just seen a shooting star!",
+                tableEx6Pt: "Eles acabaram de se mudar.",
+                tableEx6En: "They have just moved.",
+                tableEx7Pt: "A reunião acabou de começar.",
+                tableEx7En: "The meeting has just started.",
+                tableEx8Pt: "Vocês acabaram de chegar?",
+                tableEx8En: "Have you just arrived?",
+                tableEx9Pt: "Acabei de comprar um carro novo.",
+                tableEx9En: "I have just bought a new car.",
+                tableEx10Pt: "Ele acabou de ligar para mim.",
+                tableEx10En: "He has just called me.",
+                completedEx1EnLabel: "Inglês:",
+                completedEx1En: `"We have just finished the project."`,
+                completedEx1PtLabel: "Português:",
+                completedEx1Pt: `"Nós <span class="font-bold underline text-yellow-300">acabamos de terminar</span> o projeto."`,
+                completedEx1VerbTense: "Tempo verbal: Presente Perfeito",
+                completedEx2EnLabel: "Inglês:",
+                completedEx2En: `"He has lost his key, so he can't get into the house."`,
+                completedEx2PtLabel: "Português:",
+                completedEx2Pt: `"Ele <span class="font-bold underline text-yellow-300">perdeu</span> a chave, então não pode entrar em casa."`,
+                completedEx2VerbTense: "Tempo verbal: Pretérito Perfeito Simples",
+                completedEx3EnLabel: "Inglês:",
+                completedEx3En: `"The report has been sent to the client."`,
+                completedEx3PtLabel: "Português:",
+                completedEx3Pt: `"O relatório <span class="font-bold underline text-yellow-300">foi enviado</span> para o cliente."`,
+                completedEx3VerbTense: "Tempo verbal: Pretérito Perfeito",
+                completedEx4EnLabel: "Inglês:",
+                completedEx4En: `"I have bought a new car."`,
+                completedEx4PtLabel: "Português:",
+                completedEx4Pt: `"Eu <span class="font-bold underline text-yellow-300">comprei</span> um carro novo."`,
+                completedEx4VerbTense: "Tempo verbal: Pretérito Perfeito Simples",
+                completedEx5EnLabel: "Inglês:",
+                completedEx5En: `"They have finished their homework."`,
+                completedEx5PtLabel: "Português:",
+                completedEx5Pt: `"Eles <span class="font-bold underline text-yellow-300">terminaram</span> a lição de casa."`,
+                completedEx5VerbTense: "Tempo verbal: Pretérito Perfeito Simples",
+                lifeExperienceTitle: "Exemplo - Experiência de Vida",
+                lifeExperienceDesc: "Ação que aconteceu em um momento não especificado no passado, mas que contribui para sua experiência de vida até o presente.",
+                experienceEx1EnLabel: "Inglês:",
+                experienceEx1En: `"I have visited Paris three times."`,
+                experienceEx1PtLabel: "Português:",
+                experienceEx1Pt: `"Eu já <span class="font-bold underline text-yellow-300">visitei</span> Paris três vezes."`,
+                experienceEx1VerbTense: "Tempo verbal: Presente Perfeito",
+                experienceEx2EnLabel: "Inglês:",
+                experienceEx2En: `"She has never flown on a plane before."`,
+                experienceEx2PtLabel: "Português:",
+                experienceEx2Pt: `"Ela <span class="font-bold underline text-yellow-300">nunca viajou</span> de avião antes."`,
+                experienceEx2VerbTense: "Tempo verbal: Presente Perfeito",
+                experienceEx3EnLabel: "Inglês:",
+                experienceEx3En: `"They have already seen this movie, so they don't want to watch it again."`,
+                experienceEx3PtLabel: "Português:",
+                experienceEx3Pt: `"Eles já <span class="font-bold underline text-yellow-300">viram</span> esse filme, então não querem assistir de novo."`,
+                experienceEx3VerbTense: "Tempo verbal: Presente Perfeito",
+                artOfInterpretationHeader: "Além das Regras: A Arte de Interpretar o Português",
+                artOfInterpretationText: `Quando você olha para uma tradução do português, verá que é mais do que uma simples conversão de palavra por palavra. Isso porque o português é uma língua com um sistema de tempos verbais profundamente complexo e expressivo. Para um tradutor, não se trata de seguir um conjunto rígido de regras; trata-se da arte de interpretar o significado, o tom e o contexto.<br><br>Considere um conceito simples como o tempo passado. Em português, existem várias maneiras de expressar ações passadas, cada uma com um propósito distinto. Por exemplo, um tradutor deve escolher entre o **pretérito perfeito** e o **pretérito imperfeito**. O primeiro é usado para uma única ação concluída no passado, como "Eu *fui* ao mercado". O segundo, no entanto, é usado para uma ação que era habitual ou contínua no passado, como "Eu *ia* ao mercado todos os dias."<br><br>Embora ambos se traduzam para "went" ou "used to go", a distinção sutil carrega muito significado. Escolher a opção certa exige uma compreensão profunda da intenção do falante e do fluxo da narrativa. Da mesma forma, os vários modos subjuntivos exigem que um tradutor interprete condições, desejos e possibilidades, em vez de simplesmente converter palavras.
+                        <br><br>Em última análise, é por isso que traduzir português é um ato de interpretação, não apenas de gramática. Exige sensibilidade à nuances, compreensão cultural e a capacidade de escolher as palavras que melhor capturem o sentimento e a intenção original, permitindo que o verdadeiro significado transcenda as fronteiras linguísticas.`,
+                exercisesHeader: "Exercícios de Tradução",
+                exercisesText: "Traduza as frases abaixo, que usam o pretérito perfeito simples em português, para o inglês.",
+                checkButtonText: "Verificar Respostas",
+                grammarHeader: "A Estrutura Gramatical",
+                grammarText: "A fórmula é simples. Basta usar o auxiliar correto para o sujeito e o particípio passado do verbo principal.",
+                affirmativeHeader: "Forma Afirmativa",
+                affirmativeText: `<span class="explanation-formula italic">**Sujeto + have/has + Past Participle**</span>`,
+                negativeHeader: "Forma Negativa",
+                negativeText: `<span class="explanation-formula italic">**Sujeto + have/has + not + Past Participle**</span>`,
+                questionsHeader: "Perguntas",
+                questionsText: `<span class="explanation-formula italic">**Have/Has + Sujeto + Past Participle?**</span>`,
+                subjectNoteHeader: "Atenção: A Ordem das Palavras",
+                subjectNoteText: "Em português, podemos começar frases com um verbo, como em \"**Fui** ao mercado\". Em inglês, isso **não é possível**. A regra geral é **sempre começar a frase com o sujeito** (I, you, he, she, etc.) antes do verbo, por exemplo: \"**I** have gone to the market\".",
+                differenceHeader: "Quando Usar o Present Perfect Simple vs. Continuous",
+                differenceText: "Ambas as formas do **Present Perfect** focam na experiência e na importância da ação. A principal diferença está no que cada uma enfatiza.",
+                simpleHeader: "Present Perfect Simple",
+                simpleFocusTitle: "Foco:",
+                simpleFocusText: "A **experiência ou o resultado** da ação.",
+                simpleQuestionTitle: "Principal Pergunta:",
+                simpleQuestionText: "\"O que aconteceu?\"",
+                simpleExampleTitle: "Exemplo:",
+                simpleExampleText: `"Eu escrevi uma carta."`,
+                simpleTipTitle: "Dica:",
+                simpleTipText: "O que importa é que a carta foi escrita (o resultado). Não focamos no processo de escrever, mas sim no fato de que a ação aconteceu e o resultado está aqui.",
+                continuousHeader: "Present Perfect Continuous",
+                continuousFocusTitle: "Foco:",
+                continuousFocusText: "A **duração e a continuidade** da ação.",
+                continuousQuestionTitle: "Principal Pergunta:",
+                continuousQuestionText: "\"Por quanto tempo?\"",
+                continuousExampleTitle: "Exemplo:",
+                continuousExampleText: `"Eu tenho escrito esta carta por uma hora."`,
+                continuousTipTitle: "Dica:",
+                continuousTipText: "O que importa aqui é o processo e o tempo que a ação levou. O foco está na continuidade, na duração da ação, que começou no passado e ainda pode estar ocorrendo ou ter acabado de terminar.",
+                summaryText: "Em resumo, a escolha entre os dois depende de onde você quer colocar a ênfase: no **resultado** (Simple) ou na **duração/processo** (Continuous).",
+                copySuccess: "Texto copiado para a área de transferência!",
+                feedbackCorrect: "Correto!",
+                feedbackIncorrect: "Incorreto. A resposta correta é:",
+                pleaseAnswer: "Por favor, digite sua resposta.",
+            }
+        };
+
+        const elementsToTranslate = {
+            'main-header': 'mainHeader',
+            'main-text': 'mainText',
+            'why-use-header': 'whyUseHeader',
+            'why-use-text': 'whyUseText',
+            'core-concept-header': 'coreConceptHeader',
+            'core-concept-text': 'coreConceptText',
+            'case-1-title': 'case1Title',
+            'case-1-timeline-past': 'case1TimelinePast',
+            'case-1-timeline-action': 'case1TimelineAction',
+            'case-1-timeline-result': 'case1TimelineResult',
+            'case-2-title': 'case2Title',
+            'case-2-timeline-past': 'case2TimelinePast',
+            'case-2-timeline-action': 'case2TimelineAction',
+            'case-2-timeline-at-some-point': 'case2TimelineAtSomePoint',
+            'case-2-timeline-present': 'case2TimelinePresent',
+            'completed-action-title': 'completedActionTitle',
+            'completed-action-desc': 'completedActionDesc',
+            'acabar-de-title': 'acabarDeTitle',
+            'acabar-de-text': 'acabarDeText',
+            'acabar-de-table-title': 'acabarDeTableTitle',
+            'table-header-pt': 'tableHeaderPt',
+            'table-header-en': 'tableHeaderEn',
+            'table-ex1-pt': 'tableEx1Pt',
+            'table-ex1-en': 'tableEx1En',
+            'table-ex2-pt': 'tableEx2Pt',
+            'table-ex2-en': 'tableEx2En',
+            'table-ex3-pt': 'tableEx3Pt',
+            'table-ex3-en': 'tableEx3En',
+            'table-ex4-pt': 'tableEx4Pt',
+            'table-ex4-en': 'tableEx4En',
+            'table-ex5-pt': 'tableEx5Pt',
+            'table-ex5-en': 'tableEx5En',
+            'table-ex6-pt': 'tableEx6Pt',
+            'table-ex6-en': 'tableEx6En',
+            'table-ex7-pt': 'tableEx7Pt',
+            'table-ex7-en': 'tableEx7En',
+            'table-ex8-pt': 'tableEx8Pt',
+            'table-ex8-en': 'tableEx8En',
+            'table-ex9-pt': 'tableEx9Pt',
+            'table-ex9-en': 'tableEx9En',
+            'table-ex10-pt': 'tableEx10Pt',
+            'table-ex10-en': 'tableEx10En',
+            'completed-ex1-en-label': 'completedEx1EnLabel',
+            'completed-ex1-pt-label': 'completedEx1PtLabel',
+            'completed-ex1-verb-tense': 'completedEx1VerbTense',
+            'completed-ex2-en-label': 'completedEx2EnLabel',
+            'completed-ex2-pt-label': 'completedEx2PtLabel',
+            'completed-ex2-verb-tense': 'completedEx2VerbTense',
+            'completed-ex3-en-label': 'completedEx3EnLabel',
+            'completed-ex3-pt-label': 'completedEx3PtLabel',
+            'completed-ex3-verb-tense': 'completedEx3VerbTense',
+            'completed-ex4-en-label': 'completedEx4EnLabel',
+            'completed-ex4-pt-label': 'completedEx4PtLabel',
+            'completed-ex4-verb-tense': 'completedEx4VerbTense',
+            'completed-ex5-en-label': 'completedEx5EnLabel',
+            'completed-ex5-pt-label': 'completedEx5PtLabel',
+            'completed-ex5-verb-tense': 'completedEx5VerbTense',
+            'life-experience-title': 'lifeExperienceTitle',
+            'life-experience-desc': 'lifeExperienceDesc',
+            'experience-ex1-en-label': 'experienceEx1EnLabel',
+            'experience-ex1-pt-label': 'experienceEx1PtLabel',
+            'experience-ex1-verb-tense': 'experienceEx1VerbTense',
+            'experience-ex2-en-label': 'experienceEx2EnLabel',
+            'experience-ex2-pt-label': 'experienceEx2PtLabel',
+            'experience-ex2-verb-tense': 'experienceEx2VerbTense',
+            'experience-ex3-en-label': 'experienceEx3EnLabel',
+            'experience-ex3-pt-label': 'experienceEx3PtLabel',
+            'experience-ex3-verb-tense': 'experienceEx3VerbTense',
+            'art-of-interpretation-header': 'artOfInterpretationHeader',
+            'art-of-interpretation-text': 'artOfInterpretationText',
+            'exercises-header': 'exercisesHeader',
+            'exercises-text': 'exercisesText',
+            'grammar-header': 'grammarHeader',
+            'grammar-text': 'grammarText',
+            'affirmative-header': 'affirmativeHeader',
+            'affirmative-text': 'affirmativeText',
+            'negative-header': 'negativeHeader',
+            'negative-text': 'negativeText',
+            'questions-header': 'questionsHeader',
+            'questions-text': 'questionsText',
+            'subject-note-header': 'subjectNoteHeader',
+            'subject-note-text': 'subjectNoteText',
+            'difference-header': 'differenceHeader',
+            'difference-text': 'differenceText',
+            'simple-header': 'simpleHeader',
+            'simple-focus-title': 'simpleFocusTitle',
+            'simple-focus-text': 'simpleFocusText',
+            'simple-question-title': 'simpleQuestionTitle',
+            'simple-question-text': 'simpleQuestionText',
+            'simple-example-title': 'simpleExampleTitle',
+            'simple-example-text': 'simpleExampleText',
+            'simple-tip-title': 'simpleTipTitle',
+            'simple-tip-text': 'simpleTipT',
+            'continuous-header': 'continuousHeader',
+            'continuous-focus-title': 'continuousFocusTitle',
+            'continuous-focus-text': 'continuousFocusText',
+            'continuous-question-title': 'continuousQuestionTitle',
+            'continuous-question-text': 'continuousQuestionText',
+            'continuous-example-title': 'continuousExampleTitle',
+            'continuous-example-text': 'continuousExampleText',
+            'continuous-tip-title': 'continuousTipTitle',
+            'continuous-tip-text': 'continuousTipT',
+            'summary-text': 'summaryText'
+        };
+
+        const translationExercises = [
+            { pt: "Eu comi uma maçã.", en: "I ate an apple." },
+            { pt: "Você falou com ele?", en: "Did you talk to him?" },
+            { pt: "Nós fomos ao cinema.", en: "We went to the cinema." },
+            { pt: "Eles terminaram o trabalho.", en: "They finished the work." },
+            { pt: "Ela viveu em Paris.", en: "She lived in Paris." }
+        ];
+
+        let currentLang = 'pt';
+        const langSwitchBtn = document.getElementById('lang-switch-btn');
+        const messageBox = document.getElementById('message-box');
+        const exercisesContainer = document.getElementById('exercises-container');
+        
+        function showMessage(text) {
+            messageBox.textContent = text;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 2000);
+        }
+
+        function renderExercises() {
+            exercisesContainer.innerHTML = ''; // Clear existing exercises
+            translationExercises.forEach((exercise, index) => {
+                const exerciseDiv = document.createElement('div');
+                exerciseDiv.className = 'phrase-block';
+                exerciseDiv.innerHTML = `
+                    <p class="text-lg text-white mb-2">${index + 1}. ${exercise.pt}</p>
+                    <input
+                        type="text"
+                        id="answer-${index}"
+                        placeholder="${currentLang === 'pt' ? 'Digite sua tradução aqui...' : 'Enter your translation here...'}"
+                        class="w-full p-3 border-2 border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                    >
+                    <p id="feedback-${index}" class="mt-2 text-sm font-medium"></p>
+                `;
+                exercisesContainer.appendChild(exerciseDiv);
+            });
+        }
+        
+        function checkAnswers() {
+            translationExercises.forEach((exercise, index) => {
+                const inputElement = document.getElementById(`answer-${index}`);
+                const feedbackElement = document.getElementById(`feedback-${index}`);
+                
+                const userAnswer = inputElement.value.trim().toLowerCase();
+                const correctAnswer = exercise.en.trim().toLowerCase();
+
+                // Clear previous feedback classes
+                feedbackElement.classList.remove('feedback-correct', 'feedback-incorrect');
+                inputElement.classList.remove('input-correct', 'input-incorrect');
+
+                if (userAnswer === '') {
+                    feedbackElement.textContent = translations[currentLang].pleaseAnswer;
+                    feedbackElement.classList.add('feedback-incorrect');
+                    return;
+                }
+                
+                if (userAnswer === correctAnswer) {
+                    feedbackElement.textContent = translations[currentLang].feedbackCorrect;
+                    feedbackElement.classList.add('feedback-correct');
+                    inputElement.classList.add('input-correct');
+                } else {
+                    feedbackElement.textContent = `${translations[currentLang].feedbackIncorrect} "${exercise.en}"`;
+                    feedbackElement.classList.add('feedback-incorrect');
+                    inputElement.classList.add('input-incorrect');
+                }
+            });
+        }
+
+        function updateContent() {
+            const langData = translations[currentLang];
+            langSwitchBtn.textContent = langData.button;
+            document.getElementById('main-title').textContent = currentLang === 'en' ? 'The Guide to the Present Perfect Simple' : 'O Guia do Present Perfect Simple';
+
+            for (const [id, key] of Object.entries(elementsToTranslate)) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = langData[key];
+                }
+            }
+
+            const checkButton = document.getElementById('check-button');
+            if (checkButton) {
+                checkButton.textContent = translations[currentLang].checkButtonText;
+            }
+
+            // Re-render exercises to update placeholders and feedback
+            renderExercises();
+        }
+
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showMessage(translations[currentLang].copySuccess);
+        }
+
+        langSwitchBtn.addEventListener('click', () => {
+            currentLang = currentLang === 'pt' ? 'en' : 'pt';
+            updateContent();
+        });
+
+        // Add event listener to the check button
+        document.getElementById('check-button').addEventListener('click', checkAnswers);
+
+        // Initialize content and exercises on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateContent();
+        });
+    </script>
+</body>
+</html>
